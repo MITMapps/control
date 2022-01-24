@@ -1,119 +1,14 @@
 import './App.css';
 import React from 'react';
 
-
-class ProductCategoryRow extends React.Component {
-    render() {
-        const category = this.props.category;
-        return (
-            <tr>
-                <th colSpan="2">
-                    {category}
-                </th>
-            </tr>
-        );
-    }
-}
-
-class ProductRow extends React.Component {
-    render() {
-        const product = this.props.product;
-        const name = product.stocked ?
-            product.name :
-            <span style={{color: 'red'}}>
-        {product.name}
-      </span>;
-
-        return (
-            <tr>
-                <td>{name}</td>
-                <td>{product.price}</td>
-            </tr>
-        );
-    }
-}
-
-class ProductTable extends React.Component {
-    render() {
-        const rows = [];
-        let lastCategory = null;
-
-        this.props.products.forEach((product) => {
-            /// so here we can add the product category row if the category changed. Neat. But this assumes the
-            /// data is structured such that
-            if (product.category !== lastCategory) {
-                rows.push(
-                    <ProductCategoryRow
-                        category={product.category}
-                        key={product.category}/>
-                );
-            }
-            rows.push(
-                <ProductRow
-                    product={product}
-                    key={product.name}/>
-            );
-            lastCategory = product.category;
-        });
-
-        return (
-            <table>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                </tr>
-                </thead>
-                <tbody>{rows}</tbody>
-            </table>
-        );
-    }
-}
-
-class SearchBar extends React.Component {
-    render() {
-        return (
-            <form>
-                <input type="text" placeholder="Search..."/>
-                <p>
-                    <input type="checkbox"/>
-                    {' '}
-                    Only show products in stock
-                </p>
-            </form>
-        );
-    }
-}
-
-class FilterableProductTable extends React.Component {
-    render() {
-        return (
-            <div>
-                <SearchBar/>
-                <ProductTable products={this.props.products}/>
-            </div>
-        );
-    }
-}
-
-const PRODUCTS = [
-    {category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football'},
-    {category: 'Sporting Goods', price: '$9.99', stocked: true, name: 'Baseball'},
-    {category: 'Sporting Goods', price: '$29.99', stocked: false, name: 'Basketball'},
-    {category: 'Electronics', price: '$99.99', stocked: true, name: 'iPod Touch'},
-    {category: 'Electronics', price: '$399.99', stocked: false, name: 'iPhone 5'},
-    {category: 'Electronics', price: '$199.99', stocked: true, name: 'Nexus 7'}];
-
 export default App;
 
-
-///////// MY SHIT
 
 class SelectApplication extends React.Component {
     render() {
         return (
             <div className="col">
-                <InstalledApplications/>
+                <InstalledApplications installed_apps={this.props.installed_apps}/>
                 <CommunityApplications/>
             </div>
         )
@@ -128,7 +23,7 @@ class InstalledApplications extends React.Component {
                     <div className="row">
                         installed applications
                     </div>
-                    <ApplicationList/>
+                    <ApplicationList installed_apps={this.props.installed_apps}/>
                 </div>
             </div>
         )
@@ -137,12 +32,16 @@ class InstalledApplications extends React.Component {
 
 class ApplicationList extends React.Component {
     render() {
+        const rows = [];
+        this.props.installed_apps.forEach((application) => {
+            rows.push(
+                <ClickableApplication appname={application.name}/>
+            )
+        })
         return (
             <div className="row" style={{overflow: 'scroll', height: '340px'}}>
                 <ul>
-                    <ClickableApplication appname='Application one'/>
-                    <ClickableApplication appname='Application two'/>
-                    <ClickableApplication appname='Application three'/>
+                    {rows}
                 </ul>
             </div>
         )
@@ -150,6 +49,19 @@ class ApplicationList extends React.Component {
 }
 
 class CommunityApplications extends React.Component {
+    constructor(props) {
+        super(props);
+        const response = fetch('https://mitmapps.ca/search');
+        this.state = {
+            search_apps: response.json(),
+        };
+        this.handleSearch = this.handleSearch.bind(this);
+    }
+
+    handleSearch(searchText) {
+        const response = fetch('https://mitmapps.ca/search?q='+ searchText);
+        this.setState({search_apps: response.json()});
+    }
     render() {
         return (
             <div className="row">
@@ -158,8 +70,8 @@ class CommunityApplications extends React.Component {
                         <br/>
                         community applications
                     </div>
-                    <SearchApplications/>
-                    <SearchResults/>
+                    <SearchApplications onSearch={this.handleSearch}/>
+                    <SearchResults search_apps={this.state.search_apps}/>
                 </div>
             </div>
         )
@@ -171,7 +83,7 @@ class SearchApplications extends React.Component {
         return (
             <div className="row">
                 <input id="search" name="search" autoFocus="True" size="40"
-                       placeholder="search by app name"/>
+                       placeholder="search by app name" onChange={this.onSearch}/>
             </div>
         )
     }
@@ -179,12 +91,16 @@ class SearchApplications extends React.Component {
 
 class SearchResults extends React.Component {
     render() {
+        const rows = [];
+        this.props.search_apps.forEach((application) => {
+            rows.push(
+                <ClickableApplication appname={application.name}/>
+            )
+        })
         return (
             <div className="row">
                 <ul>
-                    <ClickableApplication appname='Application one'/>
-                    <ClickableApplication appname='Application two'/>
-                    <ClickableApplication appname='Application three'/>
+                    {rows}
                 </ul>
             </div>
         )
@@ -195,8 +111,8 @@ class SelectedApplication extends React.Component {
     render() {
         return (
             <div className="col">
-                <ApplicationControl/>
-                <ApplicationCode/>
+                <ApplicationControl selected_app={this.props.selected_app}/>
+                <ApplicationCode selected_app={this.props.selected_app}/>
             </div>
         )
     }
@@ -206,8 +122,8 @@ class ApplicationControl extends React.Component {
     render() {
         return (
             <div className="row">
-                <ApplicationName/>
-                <InstallApplicationButton/>
+                <ApplicationName selected_app={this.props.selected_app}/>
+                <InstallApplicationButton selected_app={this.props.selected_app}/>
             </div>
         )
     }
@@ -217,7 +133,7 @@ class ApplicationName extends React.Component {
     render() {
         return (
             <div className="col">
-                Selected App Name
+                {this.props.selected_app.name}
             </div>
         )
     }
@@ -226,8 +142,8 @@ class ApplicationName extends React.Component {
 class InstallApplicationButton extends React.Component {
     render() {
         return (
-            <div className="col">
-                install application
+            <div className="col" onClick={install_app(this.props.selected_app.name, this.props.selected_app.installed)}>
+                {this.props.selected_app.installed ? 'install' : 'uninstall'} application
             </div>
         )
     }
@@ -237,7 +153,7 @@ class ApplicationCode extends React.Component {
     render() {
         return (
             <div className="row" style={{overflow: 'scroll', height: '800px', borderStyle: 'solid'}}>
-                code
+                {this.props.selected_app.python}
             </div>
         )
     }
@@ -252,6 +168,34 @@ class ClickableApplication extends React.Component {
 }
 
 class Control extends React.Component {
+    constructor(props) {
+        super(props);
+
+        const response = fetch('https://192.168.2.128/installed/apps');
+        const installed_applications = response.json();
+        this.state = {
+            selected_app: {
+                'name': installed_applications[0]['name'],
+                'python': installed_applications[0]['python'],
+                'installed': true
+            },
+            installed_applications: installed_applications
+        };
+
+        handleInstallApplication(application_name, install_uninstall)
+        {
+
+            this.setState({
+                    selected_app: {
+                        'name': this.state.selected_app.name,
+                        'python': this.state.selected_app.python,
+                        'installed': !install_uninstall
+                    }
+                }
+            )
+        }
+    }
+
     render() {
         return (
             <div className="container">
@@ -273,7 +217,6 @@ class Control extends React.Component {
 }
 
 
-
 const APPS = [{
     python: "from mitmproxy import http from mitmproxy import ctx class FeedKiller: def __init__(self): self.num = 0 def response(self, flow: http.HTTPFlow): # facebook if 'graphql' in flow.request.path and 'CometNewsFeed_viewer' in flow.response.text: ctx.log.info('received facebook feed response') flow.response.text = '' # reddit if 'gql.reddit.com' in flow.request.url: ctx.log.info('received reddit feed response') flow.response.text = '' addons = [ FeedKiller() ]",
     name: "breakwater"
@@ -285,11 +228,6 @@ const APPS = [{
     name: "image_limiter"
 }]
 
-
-// function App() {
-//     return React.createElement(FilterableProductTable, {products: PRODUCTS});
-// }
-
 function App() {
-    return React.createElement(Control, {apps:APPS});
+    return React.createElement(Control, {apps: APPS});
 }
