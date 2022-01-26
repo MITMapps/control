@@ -170,8 +170,8 @@ class MITMApplication extends React.Component {
                         {this.props.selected_application.installed ? 'uninstall' : 'install'} application
                     </div>
                 </div>
-                <div className="row" style={{overflow: 'scroll', height: '800px', borderStyle: 'solid'}}>
-                    {this.props.selected_application.python}
+                <div className="row" style={{overflow: 'scroll', height: '800px', borderStyle: 'solid', whiteSpace:'pre-wrap'}}>
+                    <text>{this.props.selected_application.python}</text>
                 </div>
             </div>
         )
