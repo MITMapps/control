@@ -8,8 +8,8 @@ class MITMApplicationSelector extends React.Component {
     render() {
         return (
             <div className="col">
-                {/*<InstalledApplications installed_apps={this.props.installed_apps}*/}
-                {/*                       onChangeSelected={this.props.onChangeSelected}/>*/}
+                <InstalledApplications installed_applications={this.props.installed_applications}
+                                       onChangeSelected={this.props.onChangeSelected}/>
                 <SearchApplications onChangeSelected={this.props.onChangeSelected}/>
             </div>
         )
@@ -19,11 +19,13 @@ class MITMApplicationSelector extends React.Component {
 class InstalledApplications extends React.Component {
     render() {
         const rows = [];
-        this.props.installed_apps.forEach((application) => {
+        this.props.installed_applications.forEach((application) => {
             rows.push(
-                <ClickableApplication app_item={application} onChangeSelected={this.props.onChangeSelected}/>
+                <ClickableApplication onChangeSelected={this.props.onChangeSelected} app_item={application}/>
             )
         })
+
+
         return (
             <div className="row">
                 <div className="col">
@@ -49,6 +51,7 @@ class SearchApplications extends React.Component {
         };
         this.handleSearch = this.handleSearch.bind(this);
     }
+
     componentDidMount() {
         this.handleSearch('')
     }
@@ -102,44 +105,57 @@ class SearchApplications extends React.Component {
 }
 
 class MITMApplication extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleInstallApplication = this.handleInstallApplication.bind(this);
+    }
+
     handleInstallApplication() {
         let new_app_list = []
         if (this.props.selected_application.installed) {
             /// uninstall
-            for (let application in this.props.installed_applications) {
+            this.props.installed_applications.forEach((application) => {
                 if (!(application.name === this.props.selected_application.name)) {
                     // intentionally excluding the installed status
                     new_app_list.push({'name': application.name, 'python': application.python})
                 }
-            }
+            })
         } else {
             /// install
-            for (let application in this.props.installed_applications) {
+            this.props.installed_applications.forEach((application) => {
                 // intentionally excluding the installed status
                 new_app_list.push({'name': application.name, 'python': application.python})
-            }
+            })
             new_app_list.push(this.props.selected_application)
         }
 
-        fetch('https://192.168.2.128/installed/apps', {
+        const data = JSON.stringify(new_app_list)
+
+        fetch('http://127.0.0.1:8080/installed/apps', {
             method: 'POST',
-            body: JSON.stringify(new_app_list)
+            body: data,
+            headers: {
+                'Content-Type': 'application/json'
+            },
         })
             .then(res => res.json())
             .then((result) => {
-                /// we search the response for the selected application to make sure it was actually installed.
-                for (let application in result) {
-                    if (application.name === this.props.selected_application.name) {
-                        this.props.onChangeSelected(
-                            {
-                                'name': this.props.selected_application.name,
-                                'python': this.props.selected_application.python,
-                                'installed': true
-                            })
-                    }
+                    /// we search the response for the selected application to make sure it was actually installed.
+                    let installed = false
+                    result.forEach((application) => {
+                        if (application.name === this.props.selected_application.name) {
+                            installed = true
+                        }
+                    })
+
+                    this.props.onChangeSelected(
+                    {
+                        'name': this.props.selected_application.name,
+                        'python': this.props.selected_application.python,
+                        'installed': installed
+                    })
+                    this.props.onInstallApp(result)
                 }
-                this.props.onInstallApp(result)
-            }
             )
     }
 
@@ -151,7 +167,7 @@ class MITMApplication extends React.Component {
                         {this.props.selected_application.name}
                     </div>
                     <div className="col" onClick={this.handleInstallApplication}>
-                        {this.props.selected_application.installed ? 'install' : 'uninstall'} application
+                        {this.props.selected_application.installed ? 'uninstall' : 'install'} application
                     </div>
                 </div>
                 <div className="row" style={{overflow: 'scroll', height: '800px', borderStyle: 'solid'}}>
@@ -168,9 +184,11 @@ class ClickableApplication extends React.Component {
         super(props);
         this.handleChangeSelected = this.handleChangeSelected.bind(this);
     }
+
     handleChangeSelected() {
         this.props.onChangeSelected(this.props.app_item)
     }
+
     render() {
         return (
             <li onClick={this.handleChangeSelected}>{this.props.app_item.name}</li>
@@ -194,7 +212,11 @@ class Control extends React.Component {
     }
 
     componentDidMount() {
-        fetch('https://localhost:8080/installed/apps')
+        fetch('http://127.0.0.1:8080/installed/apps', {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(res => res.json())
             .then((result) => {
                 this.handleInstallApplication(result)
@@ -212,10 +234,10 @@ class Control extends React.Component {
     }
 
     handleInstallApplication(installed_applications) {
-        for (let installed_app in installed_applications) {
+        installed_applications.forEach((installed_app) => {
             installed_app['installed'] = true
-        }
-        this.setState({installed_applications: {installed_applications}})
+        })
+        this.setState({installed_applications: installed_applications})
     }
 
     handleSelectApplication(select_application) {
@@ -232,7 +254,7 @@ class Control extends React.Component {
                 <div className="row">
                     <div className="col-lg">
                         <div className="row">
-                            <MITMApplicationSelector installed_apps={this.state.installed_applications}
+                            <MITMApplicationSelector installed_applications={this.state.installed_applications}
                                                      onChangeSelected={this.handleSelectApplication}/>
                             <MITMApplication onInstallApp={this.handleInstallApplication}
                                              onChangeSelected={this.handleSelectApplication}
