@@ -78,4 +78,4 @@ def change_apps():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8180)
+    app.run(debug=True, port=8180, host='0.0.0.0')
