@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  control-backend:
+    image: mitmapps-control-backend:latest
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
+  control-frontend:
+    depends_on:
+      - control-backend
+    image: mitmapps-control-frontend:latest
+    volumes:
+      - web_data:/var/www/html
+    ports:
+      - "8000:80"
+    restart: always
+
+  mitmproxy:
+    image: mitmproxy/mitmproxy:latest
+
+volumes:
+  db_data: {}
+  web_data: {}
