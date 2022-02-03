@@ -131,7 +131,7 @@ class MITMApplication extends React.Component {
 
         const data = JSON.stringify(new_app_list)
 
-        fetch('http://127.0.0.1:8080/installed/apps', {
+        fetch('http://127.0.0.1:8180/installed/apps', {
             method: 'POST',
             body: data,
             headers: {
@@ -212,7 +212,7 @@ class Control extends React.Component {
     }
 
     componentDidMount() {
-        fetch('http://127.0.0.1:8080/installed/apps', {
+        fetch('http://127.0.0.1:8180/installed/apps', {
             headers: {
                 'Content-Type': 'application/json'
             }
