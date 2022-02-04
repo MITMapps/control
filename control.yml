@@ -20,9 +20,8 @@ services:
     volumes:
       - ./mitmapps:/app/mitmapps
       - ./mitmproxy_addon:/app/mitmproxy_addon
-      - ~/.mitmproxy:/home/mitmproxy/.mitmproxy2
+      - ~/.mitmproxy:/home/mitmproxy/.mitmproxy
     ports:
       - "0.0.0.0:8080:8080"
-    entrypoint: mitmdump -s /app/mitmproxy_addon/mitmapps.py
-
-
+      - "0.0.0.0:8081:8081"
+    entrypoint: mitmdump -s /app/mitmproxy_addon/mitmapps.py --set confdir=/home/mitmproxy/.mitmproxy
