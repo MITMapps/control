@@ -13,7 +13,7 @@ class MITMapps:
 
     def __init__(self):
         self.apps = []
-        self.app_dir = '/Users/matt/Desktop/apps_dir'
+        self.app_dir = '/app/mitmapps'
         self.is_running = False
         self.reloadtask = asyncio.ensure_future(self.watcher())
 

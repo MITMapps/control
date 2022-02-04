@@ -4,22 +4,25 @@ services:
   control-backend:
     image: mitmapps-control-backend:latest
     volumes:
-      - db_data:/var/lib/mysql
-    restart: always
+      - ./mitmapps:/app/mitmapps
+    ports:
+      - "0.0.0.0:90:8080"
 
   control-frontend:
     depends_on:
       - control-backend
     image: mitmapps-control-frontend:latest
-    volumes:
-      - web_data:/var/www/html
     ports:
-      - "8000:80"
-    restart: always
+      - "0.0.0.0:80:3000"
 
   mitmproxy:
     image: mitmproxy/mitmproxy:latest
+    volumes:
+      - ./mitmapps:/app/mitmapps
+      - ./mitmproxy_addon:/app/mitmproxy_addon
+      - ~/.mitmproxy:/home/mitmproxy/.mitmproxy2
+    ports:
+      - "0.0.0.0:8080:8080"
+    entrypoint: mitmdump -s /app/mitmproxy_addon/mitmapps.py
 
-volumes:
-  db_data: {}
-  web_data: {}
+

@@ -9,8 +9,8 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-mitmapps_dir = '/Users/matt/Desktop/apps_dir'
-certs_dir = '/Users/matt/proj/mitmproxy/mitmproxy/addons'
+mitmapps_dir = './mitmapps'
+certs_dir = './certs'
 
 APP_LIST_LIMIT = 9000
 
@@ -78,4 +78,4 @@ def change_apps():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8180, host='0.0.0.0')
+    app.run(debug=True, port=8080, host='0.0.0.0')
