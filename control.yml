@@ -2,7 +2,7 @@ version: '3'
 
 services:
   control-backend:
-    image: mitmapps-control-backend:latest
+    image: mitmapps/control-backend:latest
     volumes:
       - ./mitmapps:/app/mitmapps
     ports:
@@ -11,7 +11,7 @@ services:
   control-frontend:
     depends_on:
       - control-backend
-    image: mitmapps-control-frontend:latest
+    image: mitmapps/control-frontend:latest
     ports:
       - "0.0.0.0:80:3000"
 
