@@ -44,8 +44,8 @@ class MITMapps:
 
                 # add new apps
                 for mitm_app in os.listdir(self.app_dir):
-                    if '.py' in mitm_app[-4:] and mitm_app not in [app.path for app in self.apps]:
-                        full_path = os.path.join(self.app_dir, mitm_app)
+                    full_path = os.path.join(self.app_dir, mitm_app)
+                    if '.py' in mitm_app[-4:] and full_path not in [app.path for app in self.apps]:
                         ctx.log.info("MITMapps adding: %s" % full_path)
                         new_app = script.Script(full_path, True)
                         self.apps.append(new_app)
