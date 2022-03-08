@@ -16,10 +16,10 @@ services:
       - "0.0.0.0:80:3000"
 
   mitmproxy:
-    image: mitmproxy/mitmproxy:latest
+    image: mitmapps/mitmproxy:latest
     volumes:
       - ./mitmapps:/app/mitmapps
-      - ./mitmproxy_addon:/app/mitmproxy_addon
+      - ./mitmproxy_mods/mitmproxy_addon:/app/mitmproxy_addon
       - ~/.mitmproxy:/home/mitmproxy/.mitmproxy
     ports:
       - "0.0.0.0:8080:8080"
