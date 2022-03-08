@@ -59,10 +59,12 @@ class SearchApplications extends React.Component {
     handleSearch(searchText) {
         let query = ''
         if (searchText.length > 0) {
-            query = '/' + searchText
+            query = 'https://mitmapps.ca/api/app/' + searchText
+        } else {
+            query = 'https://mitmapps.ca/api/top/apps'
         }
 
-        fetch('https://mitmapps.ca/apps' + query, {
+        fetch(query, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -171,7 +173,7 @@ class MITMApplication extends React.Component {
                     </div>
                 </div>
                 <div className="row" style={{overflow: 'scroll', height: '800px', borderStyle: 'solid', whiteSpace:'pre-wrap'}}>
-                    <text>{this.props.selected_application.python}</text>
+                    {this.props.selected_application.python}
                 </div>
             </div>
         )
