@@ -1,7 +1,7 @@
 # Keep it simple stupid.
 import json
 
-from flask import Flask, request
+from flask import Flask, request, Response
 import requests
 import os
 import re
@@ -43,7 +43,7 @@ def validate_app_id(app_id):
 @app.route('/installed/apps', methods=['GET'])
 def list_apps():
     # return the list of currently installed apps.
-    return json.dumps(get_installed_apps())
+    return Response(json.dumps(get_installed_apps()), content_type='application/json')
 
 
 @app.route('/installed/apps', methods=['POST'])

@@ -25,3 +25,9 @@ services:
       - "0.0.0.0:8080:8080"
       - "0.0.0.0:8081:8081"
     entrypoint: mitmdump -s /app/mitmproxy_addon/mitmapps.py --set confdir=/home/mitmproxy/.mitmproxy
+    deploy:
+      resources:
+        limits:
+          memory: 500M
+        reservations:
+          memory: 200M
