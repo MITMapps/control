@@ -74,7 +74,7 @@ def change_apps():
     for app_id in deprecated_apps:
         os.remove(os.path.join(mitmapps_dir, app_id))
 
-    return json.dumps(get_installed_apps())
+    return Response(json.dumps(get_installed_apps()), content_type='application/json')
 
 
 if __name__ == "__main__":
