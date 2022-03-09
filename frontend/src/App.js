@@ -193,7 +193,7 @@ class ClickableApplication extends React.Component {
 
     render() {
         return (
-            <li onClick={this.handleChangeSelected}>{this.props.app_item.name}</li>
+            <li key={this.props.app_item.name} onClick={this.handleChangeSelected}>{this.props.app_item.name}</li>
         )
     }
 }
