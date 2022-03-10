@@ -36,6 +36,10 @@ def create_success_message(detail):
 
 
 def validate_app_id(app_id):
+    if len(app_id) < 4:
+        return False
+    if app_id[-3:] != '.py':
+        return False
     # returns true if valid
     return bool(re.match('^[a-zA-Z0-9_.-]*$', app_id))
 
@@ -69,6 +73,8 @@ def change_apps():
         if validate_app_id(app_name):
             with open(os.path.join(mitmapps_dir, desired_app_map[app_name]['name']), 'w+') as f:
                 f.write(desired_app_map[app_name]['python'])
+        else:
+            return 'error, invalid app name', 400
 
     # remove extra apps
     for app_id in deprecated_apps:
