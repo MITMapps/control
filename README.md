@@ -14,9 +14,9 @@ grocery list is:
 - 1x [15 Watt USB-C PSU](https://www.sparkfun.com/products/15448),
 - 1x [64 GB microSD card](https://www.amazon.com/SAMSUNG-Adapter-microSDXC-MB-ME64KA-AM/dp/B09B1F9L52/ref=sr_1_5?keywords=micro+sd&qid=1647272215&sr=8-5),
 - 1x [USB microSD card reader](https://www.amazon.com/SanDisk-MobileMate-microSD-Card-Reader/dp/B07G5JV2B5/ref=sr_1_3?keywords=micro+sd+reader+usb&qid=1647272249&sprefix=micro+sd+read%2Caps%2C127&sr=8-3),
+- 1x Computer ... Mac, Windows, Linux, should all be able to get the job done as long as it has a USB.
 
-which should end up being around 100 USD. All of this is general purpose so you can use it for other projects. 
-
+which should end up being around 100 USD. All of this is general purpose so you can use it for other projects.
 # Setting up the  Host
 Once you have all the hardware it's time to set it up. We will need to perform the following:
 
@@ -25,19 +25,51 @@ Let's get an operating system running on the raspberry pi.
 ##### Install Raspberry Pi Imager
 from: https://www.raspberrypi.com/software/
 ##### Raspberry Pi Imager - CHOOSE OS
-
+- Download [Raspberry Pi OS Lite 64 bit](https://www.raspberrypi.com/software/operating-systems/#raspberry-pi-os-64-bit)
+> :warning: Make sure to download the 64 bit version
+- Select the downloaded zip `2022-01-28-raspios-bullseye-arm64-lite.zip`
 ##### Raspberry Pi Imager - CHOOSE STORAGE
-
+- Plug in the USB -> SD card reader
+- Insert SD card into reader
+- Select the SD card in CHOOSE STORAGE
 ##### Raspberry Pi Imager - WRITE
-
+- Click the WRITE button.
+- Read the prompt and make sure this is the correct storage device.
+- Click the YES button for the prompt.
 ##### Modify Wifi Settings
+- Open your terminal
+- Navigate to the boot drive `cd /Volumes/boot`
+- create an empty file called ssh in the root director of the drive `nano ssh`
+- create a text file `nano wpa_supplicant.conf`
+```bash
+country=US
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
 
-- Load the operating system onto the SD card
-- Modify the files to boot with WIFI
-- Plug in the SD card
-- Plug power into the Raspberry Pi
-- SSH (connect) into the Raspberry Pi
-- Run the setup script
+network={
+scan_ssid=1
+ssid="your_wifi_ssid"     # MAKE SURE YOU KEEP THE QUOTES
+psk="your_wifi_password"
+}
+```
+
+- disconnect the sd card
+- insert it into the pi (I have forgotten this)
+- now when you boot it up it should show up on the wifi.
+- use your router to find the pi's address.
+- `ssh pi@192.168.IP.ADDRESS`
+
+
+- set the password `passwd`
+- find the STATIC_IP `hostname -I`
+- find the ROUTER_IP `ip r | grep default`
+- set a static IP `sudo nano /etc/dhcpd.conf`
+```
+interface wlan0
+static ip_address=STATIC_IP/24
+static routers=ROUTER_IP
+static domain_name_servers=ROUTER_IP
+```
 
 # build 
 ```bash
