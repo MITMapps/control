@@ -38,10 +38,10 @@ from: https://www.raspberrypi.com/software/
 - Click the WRITE button.
 - Read the prompt and make sure this is the correct storage device.
 - Click the YES button for the prompt.
-##### Modify Wifi Settings
+### Modify Wifi Settings
 - Open your terminal
 - Navigate to the boot drive `cd /Volumes/boot`
-- create an empty file called ssh in the root director of the drive `nano ssh`
+- create an empty file called ssh in the root director of the drive `touch ssh`
 - create a text file `nano wpa_supplicant.conf`
 ```bash
 country=US
@@ -54,15 +54,18 @@ ssid="your_wifi_ssid"     # MAKE SURE YOU KEEP THE QUOTES
 psk="your_wifi_password"
 }
 ```
-
+### Connecting to the Pi
 - disconnect the sd card
 - insert it into the pi (I have forgotten this)
 - now when you boot it up it should show up on the wifi.
-- use your router to find the pi's address.
-- `ssh pi@192.168.IP.ADDRESS`
+- find the pi's IP address. https://pimylifeup.com/raspberry-pi-ip-address/
+- connect to the pi `ssh pi@192.168.IP.ADDRESS`
+- default password is raspberry
 
-
+### Set a new password
 - set the password `passwd`
+
+### Set the static IP 
 - find the STATIC_IP `hostname -I`
 - find the ROUTER_IP `ip r | grep default`
 - set a static IP `sudo nano /etc/dhcpd.conf`
@@ -72,8 +75,39 @@ static ip_address=STATIC_IP/24
 static routers=ROUTER_IP
 static domain_name_servers=ROUTER_IP
 ```
+# Setting up the environment
+### Install Git
+```bash
+sudo apt-get install -y git 
+```
+### Install docker
+```
+curl -fsSL https://get.docker.com -o get-docker.sh
 
-# build 
+sudo sh get-docker.sh
+
+sudo chmod 666 /var/run/docker.sock
+
+docker swarm init
+```
+### clone the repository
+```
+git clone https://github.com/MITMapps/control.git
+cd control
+```
+
+### create the MITMapps directory
+```
+mkdir mitmapps
+```
+
+# Run MITMapps Control
+```bash
+docker stack deploy -c control.yml control
+docker service logs -f control_mitmproxy
+```
+
+# Build the MITMapps Control images
 ```bash
 git pull
 
@@ -93,13 +127,8 @@ docker push mitmapps/mitmproxy:latest
 cd..
 ```
 
-# run
-```bash
-docker stack deploy -c control.yml control
-docker service logs -f control_mitmproxy
-```
 
-# redeploy
+# Redeploy
 ```bash
 docker stack rm control
 docker stack deploy -c control.yml control
