@@ -1,10 +1,13 @@
+import {Card, CardContent, CardHeader, Typography} from "@mui/material";
+
 export default function ClickableApplication({onChangeSelected, app_item, installed}) {
+    const sub_header = app_item.author ? app_item.author.user_name: null;
     return (
-        <li key={app_item.name} onClick={() => {
-            onChangeSelected({name: app_item.name, python: app_item.python, installed: installed})
+        <Card sx={{ display: 'inline'}} key={app_item.name} onClick={() => {
+            onChangeSelected(app_item)
         }
         }>
-            {app_item.name}
-        </li>
+            <CardHeader title={app_item.name} subheader={sub_header}/>
+        </Card>
     )
 }
