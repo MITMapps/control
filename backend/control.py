@@ -51,37 +51,31 @@ def list_apps():
 
 
 @app.route('/installed/apps', methods=['POST'])
-def change_apps():
-    """
-    failure modes:
-    - the app list isn't a list
-    - the app list has an entry that isn't an app id
-    - the app list has an app id that can't be retrieved
-    """
+def install_app():
+    desired_app = request.json
 
-    desired_app_list = request.json
-    desired_app_names = set(a['name'] for a in desired_app_list)
-    desired_app_map = {a['name']: a for a in desired_app_list}
+    if validate_app_id(desired_app['name']):
+        with open(os.path.join(mitmapps_dir, desired_app['name']), 'w+') as f:
+            f.write(desired_app['python'])
+    else:
+        return 'error, invalid app name', 400
+
+    return Response(json.dumps(get_installed_apps()), content_type='application/json')
+
+
+@app.route('/installed/apps', methods=['DELETE'])
+def delete_app():
+    desired_app = request.json
     current_app_list = get_installed_apps()
     current_app_names = set(a['name'] for a in current_app_list)
 
-    deprecated_apps = current_app_names - desired_app_names
-    new_apps = desired_app_names - current_app_names
+    if desired_app['name'] not in current_app_names:
+        return 'error, app not installed', 400
 
-    # add new apps
-    for app_name in new_apps:
-        if validate_app_id(app_name):
-            with open(os.path.join(mitmapps_dir, desired_app_map[app_name]['name']), 'w+') as f:
-                f.write(desired_app_map[app_name]['python'])
-        else:
-            return 'error, invalid app name', 400
-
-    # remove extra apps
-    for app_id in deprecated_apps:
-        os.remove(os.path.join(mitmapps_dir, app_id))
+    os.remove(os.path.join(mitmapps_dir, desired_app['name']))
 
     return Response(json.dumps(get_installed_apps()), content_type='application/json')
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080, host='0.0.0.0')
+    app.run(debug=True, port=8080)
