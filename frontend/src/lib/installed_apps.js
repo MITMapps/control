@@ -1,4 +1,4 @@
-const url = window.location.protocol + '//' + window.location.hostname + ':8080/installed/apps';
+const url = window.location.protocol + '//' + window.location.hostname + ':90/installed/apps';
 
 export async function getInstalledApps() {
     const resp = await fetch(url, {
