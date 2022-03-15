@@ -8,7 +8,7 @@ The services are:
 and send them to the Control Backend. 
 - MITMproxy: [mitmproxy](https://mitmproxy.org) is a free and open source interactive HTTPS proxy (external to MITMapps) 
 
-# Host Hardware
+# 1 Host Hardware
 For development the recommended host is a raspberry PI 4 Model B 4 GB. As of present testing this system is using
 7524MB of disk so it's advisable to have at **least** a 16 GB SSD card. If you are looking at purchasing the kit your 
 grocery list is:
@@ -19,7 +19,7 @@ grocery list is:
 - 1x Computer ... Mac, Windows, Linux, should all be able to get the job done as long as it has a USB.
 
 which should end up being around 100 USD. All of this is general purpose so you can use it for other projects.
-# Setting up the  Host
+# 2 Setting up the  Host
 Once you have all the hardware it's time to set it up. We will need to perform the following:
 
 ### Install The Operating System
@@ -75,7 +75,7 @@ static ip_address=STATIC_IP/24
 static routers=ROUTER_IP
 static domain_name_servers=ROUTER_IP
 ```
-# Setting up the environment
+# 3 Setting up the environment
 ### Install Git
 ```bash
 sudo apt-get install -y git 
@@ -99,15 +99,34 @@ cd control
 ### create the MITMapps directory
 ```
 mkdir mitmapps
+mkdir /home/pi/.mitmproxy
 ```
 
-# Run MITMapps Control
+# 4 Run MITMapps Control
 ```bash
 docker stack deploy -c control.yml control
 docker service logs -f control_mitmproxy
 ```
 
-# Build the MITMapps Control images
+# 5 Load the certs
+```
+exit 
+scp pi@192.168.X.X:/home/pi/.mitmproxy/mitmproxy-ca-cert.pem ~/Desktop/mitmproxy-ca-cert.pem
+```
+- follow https://docs.mitmproxy.org/stable/concepts-certificates/ for your device.
+# 6 Connect to MITMapps Control
+- Open your browser to the static IP address you defined above. EG http://192.168.2.128
+- This page is how you control your MITMapps on your MITMproxy.
+
+# 7 Add an MITMapp
+- Select a MITMapp under "community applications"
+- Review the code in the right panel. You are responsible for what you load into your MITM.
+- Once approved click "install application"
+- If it installed successfully then it will show up under "installed applications"
+
+# Development
+These are only necesary if you want to change MITMapps control.
+### Build the MITMapps Control images
 ```bash
 git pull
 
@@ -128,7 +147,7 @@ cd..
 ```
 
 
-# Redeploy
+### Redeploy
 ```bash
 docker stack rm control
 docker stack deploy -c control.yml control
